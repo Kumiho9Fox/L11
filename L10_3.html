@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Тюлячкина Мария</title>
+<style>
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: center;
+    height: 50px;
+    width: 50px;
+  }
+  th {
+    background-color: #f2f2f2;
+  }
+  .today {
+    background-color: #e0e0e0;
+  }
+  .selected {
+    background-color: #b3d4fc;
+  }
+</style>
+</head>
+<body>
+<input type="date" id="dateInput">
+<div id="calendar"></div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+  $('#dateInput').on('change', function() {
+    generateCalendar($(this).val());
+  });
+
+  function generateCalendar(date) {
+    var currentDate = new Date(date);
+    var year = currentDate.getFullYear();
+    var month = currentDate.getMonth();
+    var firstDay = new Date(year, month, 1);
+    var lastDay = new Date(year, month + 1, 0);
+
+    var startDayOfWeek = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+    var endDayOfMonth = lastDay.getDate();
+
+    var calendarHtml = '<table>';
+    calendarHtml += '<tr><th>Пн</th><th>Вт</th><th>Ср</th><th>Чт</th><th>Пт</th><th>Сб</th><th>Вс</th></tr>';
+
+    var day = 1;
+    for (var i = 0; i < 6; i++) {
+      calendarHtml += '<tr>';
+      for (var j = 0; j < 7; j++) {
+        if (i === 0 && j < startDayOfWeek || day > endDayOfMonth) {
+          calendarHtml += '<td></td>';
+        } else {
+          var isToday = (day === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear()) ? 'today' : '';
+          var isSelected = (day === currentDate.getDate() && month === currentDate.getMonth() && year === currentDate.getFullYear()) ? 'selected' : '';
+          calendarHtml += '<td class="' + isToday + ' ' + isSelected + '">' + day + '</td>';
+          day++;
+        }
+      }
+      calendarHtml += '</tr>';
+      if (day > endDayOfMonth) {
+        break;
+      }
+    }
+    calendarHtml += '</table>';
+
+    $('#calendar').html(calendarHtml);
+  }
+});
+</script>
+</body>
+</html>

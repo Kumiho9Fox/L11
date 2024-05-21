@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тюлячкина Мария</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .calculator { width: 300px; margin: 50px auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
+        input, button { width: calc(100% - 10px); margin-top: 5px; padding: 5px; }
+        button { cursor: pointer; }
+        #result { width: 100%; text-align: right; font-size: 20px; }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" id="result" readonly>
+        <input type="number" id="input1" placeholder="Число 1">
+        <input type="number" id="input2" placeholder="Число 2">
+        <button onclick="calculate('add')">+</button>
+        <button onclick="calculate('subtract')">-</button>
+        <button onclick="calculate('multiply')">*</button>
+        <button onclick="calculate('divide')">/</button>
+        <button onclick="saveResult()">Сохранить результат</button>
+    </div>
+    <script>
+        let memory = null;
+        function calculate(operation) {
+            const input1 = parseFloat(document.getElementById('input1').value);
+            const input2 = parseFloat(document.getElementById('input2').value);
+            let result;
+            switch (operation) {
+                case 'add':
+                    result = input1 + input2;
+                    break;
+                case 'subtract':
+                    result = input1 - input2;
+                    break;
+                case 'multiply':
+                    result = input1 * input2;
+                    break;
+                case 'divide':
+                    if (input2 !== 0) {
+                        result = input1 / input2;
+                    } else {
+                        alert('Деление на ноль невозможно!');
+                        return;
+                    }
+                    break;
+                default:
+                    return;
+            }
+            document.getElementById('result').value = result;
+        }
+        function saveResult() {
+            const result = document.getElementById('result').value;
+            if (result) {
+                memory = result;
+                alert('Результат сохранен в памяти: ' + memory);
+            } else {
+                alert('Сначала выполните вычисления!');
+            }
+        }
+    </script>
+</body>
+</html>

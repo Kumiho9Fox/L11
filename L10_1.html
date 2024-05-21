@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Тюлячкина Мария</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<style>
+  table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+  }
+  th, td {
+    padding: 10px;
+    text-align: left;
+  }
+  th {
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<table id="radiosTable">
+  <thead>
+    <tr>
+      <th data-type="string">Питание</th>
+      <th data-type="string">Тип</th>
+      <th data-type="number">Выходная мощность звука</th>
+      <th data-type="string">Тип тюнера</th>
+      <th data-type="string">Модуляция</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+<script>
+  const radios = [
+    { power: "Батарейки", type: "Портативный", soundPower: 5, tunerType: "Аналоговый", modulation: "AM" },
+    { power: "Сеть", type: "Стационарный", soundPower: 20, tunerType: "Цифровой", modulation: "FM" },
+    { power: "Батарейки", type: "Портативный", soundPower: 3, tunerType: "Цифровой", modulation: "AM" }
+  ];
+  localStorage.setItem('radios', JSON.stringify(radios));
+  $(document).ready(function() {
+    const storedRadios = JSON.parse(localStorage.getItem('radios'));
+    function fillTable(data) {
+      const tbody = $('#radiosTable tbody');
+      tbody.empty();
+      data.forEach(radio => {
+        tbody.append(`<tr>
+          <td>${radio.power}</td>
+          <td>${radio.type}</td>
+          <td>${radio.soundPower}</td>
+          <td>${radio.tunerType}</td>
+          <td>${radio.modulation}</td>
+        </tr>`);
+      });
+    }
+    fillTable(storedRadios);
+    $('th').click(function() {
+      const index = $(this).index();
+      const type = $(this).data('type');
+      const rows = $('#radiosTable tbody tr').toArray();
+      rows.sort((a, b) => {
+        const valA = $(a).find('td').eq(index).text();
+        const valB = $(b).find('td').eq(index).text();
+        return type === 'number' ? valA - valB : valA.localeCompare(valB);
+      });
+      $.each(rows, (i, row) => {
+        $('#radiosTable tbody').append(row);
+      });
+    });
+  });
+</script>
+</body>
+</html>

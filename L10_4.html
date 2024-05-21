@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Тюлячкина Мария</title>
+<style>
+table {
+width: 100%;
+border-collapse: collapse;
+}
+th, td {
+border: 1px solid black;
+padding: 8px;
+text-align: center;
+height: 50px;
+width: 50px;
+}
+th {
+background-color: #f2f2f2;
+}
+.today {
+background-color: #e0e0e0;
+}
+.selected {
+background-color: #b3d4fc;
+}
+.event {
+background-color: #d3e0fc;
+}
+#modal {
+display: none;
+position: fixed;
+z-index: 1;
+left: 0;
+top: 0;
+width: 100%;
+height: 100%;
+overflow: auto;
+background-color: rgba(0,0,0,0.4);
+}
+#modalContent {
+background-color: #fefefe;
+margin: 15% auto;
+padding: 20px;
+border: 1px solid #888;
+width: 80%;
+}
+</style>
+</head>
+<body>
+<input type="date" id="dateInput">
+<div id="calendar"></div>
+<div id="modal">
+    <div id="modalContent">
+        <span id="closeModal">&times;</span>
+        <h2>Информация о мероприятии</h2>
+        <p id="eventInfo"></p>
+        <form id="eventForm">
+            <label for="eventTitle">Название мероприятия:</label>
+            <input type="text" id="eventTitle" required>
+            <label for="eventDescription">Описание:</label>
+            <textarea id="eventDescription"></textarea>
+            <input type="submit" value="Добавить">
+        </form>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        var events = JSON.parse(localStorage.getItem('events')) || {};
+        if (!events['2023-05-09']) {
+            events['2023-05-09'] = { title: 'Мероприятие 9 мая', description: 'Описание мероприятия' };
+            localStorage.setItem('events', JSON.stringify(events));
+        }
+    $('#dateInput').on('change', function() {
+        generateCalendar($(this).val());
+    });
+    function generateCalendar(date) {
+        var currentDate = new Date(date);
+        var year = currentDate.getFullYear();
+        var month = currentDate.getMonth();
+        var firstDay = new Date(year, month, 1);
+        var lastDay = new Date(year, month + 1, 0);
+        var startDayOfWeek = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+        var endDayOfMonth = lastDay.getDate();
+        var calendarHtml = '<table>';
+        calendarHtml += '<tr><th>Пн</th><th>Вт</th><th>Ср</th><th>Чт</th><th>Пт</th><th>Сб</th><th>Вс</th></tr>';
+        var day = 1;
+        for (var i = 0; i < 6; i++) {
+            calendarHtml += '<tr>';
+            for (var j = 0; j < 7; j++) {
+                if (i === 0 && j < startDayOfWeek || day > endDayOfMonth) {
+                    calendarHtml += '<td></td>';
+                } else {
+                    var isToday = (day === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear()) ? 'today' : '';
+                    var hasEvent = events[year + '-' + month + '-' + day] ? 'event' : '';
+                    calendarHtml += '<td class="' + isToday + ' ' + hasEvent + '" data-date="' + year + '-' + month + '-' + day + '">' + day + '</td>';
+                    day++;
+                }
+            }
+            calendarHtml += '</tr>';
+            if (day > endDayOfMonth) {
+                break;
+            }
+        }
+        calendarHtml += '</table>';
+        $('#calendar').html(calendarHtml);
+    }
+    $('#calendar').on('click', 'td.event', function() {
+        var date = $(this).data('date');
+        var event = events[date];
+        $('#eventInfo').text(event.title + ': ' + event.description);
+        $('#modal').show();
+    });
+    $('#calendar').on('dblclick', 'td:not(.event)', function() {
+        var date = $(this).data('date');
+        $('#eventForm').find('#eventTitle').val('');
+        $('#eventForm').find('#eventDescription').val('');
+        $('#modal').find('#eventForm').attr('data-date', date);
+        $('#modal').show();
+    });
+    $('#closeModal').on('click', function() {
+        $('#modal').hide();
+    });
+    $('#eventForm').on('submit', function(e) {
+        e.preventDefault();
+        var date = $(this).attr('data-date');
+        var eventTitle = $('#eventTitle').val();
+        var eventDescription = $('#eventDescription').val();
+        events[date] = { title: eventTitle, description: eventDescription };
+        localStorage.setItem('events', JSON.stringify(events));
+        generateCalendar($('#dateInput').val());
+        $('#modal').hide();
+    });
+    generateCalendar($('#dateInput').val());
+});
+</script>
+</body>
+</html>
